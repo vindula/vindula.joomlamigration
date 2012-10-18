@@ -1,0 +1,22 @@
+<configure
+    xmlns:browser="http://namespaces.zope.org/browser"
+	xmlns="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="vindula.joomlamigration">
+
+	<!-- Necessario adicionar no buildout: eggs = z3c.jbot -->
+    <include package="z3c.jbot" file="meta.zcml" />  
+
+
+	<!-- Views: outros -->
+	<browser:page
+		for="*"
+		name="import_view"
+		class=".import_view.ImportJoomla"
+		permission="zope2.View"
+		template="templates/import.pt"
+		allowed_interface=".interfaces.IMigration"
+	/>
+	
+	
+ </configure>

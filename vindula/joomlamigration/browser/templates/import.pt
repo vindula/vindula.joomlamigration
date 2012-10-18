@@ -1,0 +1,109 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      lang="en"
+      i18n:domain="plone">
+<body tal:define="form_keys python: context.REQUEST.form.keys()">
+	<!--span tal:content="view/teste"/-->
+	
+	<!--tal:fixModificationDate condition="python:'fixDate' in context.REQUEST.form.keys()">
+		<span tal:content="view/fixModificationDate"/>
+	</tal:fixModificationDate>
+	
+	<form action="./@@import_view" method="post">
+		URL:<input type="text" name="url" 
+			 size="150"
+			tal:attributes="value python:context.REQUEST.form.get('url','')">
+		
+		<input type="submit" value="Consultar">
+		<a tal:attributes="href python:'../@@import_view?url=%s' % context.REQUEST.form.get('url','')">../</a>
+	</form-->
+	
+	<tal:lista_conteudo tal:define="contents_joomla view/importContents">
+		<h1>Conteúdos:</h1>
+		
+		<!--table>
+			<tr tal:repeat="content contents_joomla">
+				<td style="border: 1px solid;"><span tal:content="content/id"></span></td>
+				<td style="border: 1px solid;"><span tal:content="content/title"></span></td>
+				<td style="border: 1px solid;"><span tal:content="content/alias"></span></td>
+				<td style="border: 1px solid;"><span tal:content="content/catid"></span></td>
+			</tr>
+		</table-->
+		
+	</tal:lista_conteudo>
+	
+	<!--tal:lista_conteudo condition="python: 'url' in form_keys and 'path' not in form_keys and 'fix-images' not in form_keys and 'all' not in form_keys">
+		<h1>Importação de conteudo</h1>
+		<ul>
+			<tal:conteudo repeat="obj view/getListaConteudo">
+				<form action="./@@import_view" style="margin:0px !important" method="post">
+					<li>
+						<span tal:content="string:${obj/portal_type} -"/>
+						
+						<tal:container condition="python:len(obj['items'])>0">
+							<a tal:attributes="href python:'./@@import_view?url=http://%s%s/listaConteudo' % (context.REQUEST.form.get('url').split('/')[2],obj['objeto'])">
+								<span tal:content="string:${obj/objeto}"/>
+							</a>
+						</tal:container>
+						<tal:nocontainer condition="python:len(obj['items'])==0">
+								<span tal:content="string:${obj/objeto}"/>
+						</tal:nocontainer>
+						
+					
+						<input type="hidden" name="path"
+					     tal:attributes="value obj/objeto"/>
+					    <input type="hidden" name="url"
+					     tal:attributes="value context/REQUEST/form/url"/>
+						<input type="submit" value="Importar">
+					</li>
+				</form>
+			</tal:conteudo>
+		</ul>
+		<form action="./@@import_view" style="margin:0px !important">
+			<input type="hidden" value="all" name="all"/>
+			<input type="submit" value="Importar tudo">
+			<input type="text" name="url" 
+				 size="150"
+				tal:attributes="value python:context.REQUEST.form.get('url','')">
+		</form>
+		
+		<form action="./@@import_view" style="margin:0px !important">
+			<input type="text" name="url" size="100">
+			<input type="hidden" value="all" name="fix-images"/>
+			
+			<input type="submit" value="Consertar links de imagens">
+		</form>
+	</tal:lista_conteudo>
+	
+	<tal:import_all tal:condition="python:'all' in form_keys">
+		<span tal:content="python: view.ImportAll()"/>
+	</tal:import_all>
+	
+
+	<tal:lista_importacao condition="python: 'path' in form_keys and 'all' not in form_keys">
+		<h1>Conteúdo importado</h1>
+		<tal:detalhes_conteudo tal:define="detalhes python: view.createConteudo(url=context.REQUEST.form.get('url'))">
+		Path:<span tal:content="detalhes/path"/>
+		<br/><br/>
+		Campos:
+			<ul>
+				<tal:fields repeat="field detalhes/fields">
+					<li tal:content="field">FIELD</li>
+				</tal:fields>
+			</ul>
+			
+			<br/>
+			<h2>Visualizar conteúdo:</h2>
+			<a tal:attributes="href detalhes/obj/absolute_url"
+			   tal:content="detalhes/obj/absolute_url" target="blank"/>
+		</tal:detalhes_conteudo>
+		
+	</tal:lista_importacao>
+	
+	<tal:fix-images condition="python: 'fix-images' in context.REQUEST.form.keys()">
+		<span tal:content="view/fixLinks"/>
+	</tal:fix-images-->
+
+	
+	
+</body>
+</html>
