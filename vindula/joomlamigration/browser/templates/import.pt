@@ -18,7 +18,7 @@
 	</form-->
 	
 	<tal:lista_conteudo tal:define="contents_joomla view/importContents">
-		<h1>Conteúdos:</h1>
+		<h1>Importação Joomla:</h1>
 		
 		<!--table>
 			<tr tal:repeat="content contents_joomla">
@@ -28,6 +28,14 @@
 				<td style="border: 1px solid;"><span tal:content="content/catid"></span></td>
 			</tr>
 		</table-->
+		
+		<form tal:attributes="action string:${context/portal_url}/import_view" action="/import_view" method="post">
+			<span><label>URL da importação:</label></span><br>
+			<span>Insira a URL de onde vão ser importado os dados.</span>
+			<input type="text" name="url_from" />
+			
+			<input type="submit" name="importa" value="importar" />
+		</form>
 		
 	</tal:lista_conteudo>
 	

@@ -35,13 +35,9 @@ def url_to_params(url):
 
 class ImportJoomla(BrowserView):
     
-    url_joomla = 'http://www.parauapebas.pa.gov.br/'
+    url_joomla = ''
     
     def createContent(self, store_obj=None, context=None):
-        
-        if store_obj.alias == 'uma-nova-cidade':
-            import pdb;pdb.set_trace()
-        
         if not context:
             context = getSite()
             
@@ -52,8 +48,6 @@ class ImportJoomla(BrowserView):
             conteudo = {}
             text_store = store_obj.introtext + store_obj.fulltext
             found_img = re.findall('img .*?src="(.*?)"', text_store)
-#            found_img = re.findall('<img[^>]*\ssrc="(.*?)"', text_store)
-            
             
             for img in found_img:
                 url_img = self.url_joomla + img.replace(' ', '%20')
@@ -89,11 +83,23 @@ class ImportJoomla(BrowserView):
         return None
     
     def importContents(self):
-        
-        #Busca todos os menus da base do joomla
-        result_menus = store.find(Menu).order_by(Menu.sublevel, Menu.parent, Menu.ordering)
-        for menu in result_menus:
-            self.importMenu(menu=menu)
+        form = self.request.form
+        if form.get('importa'):
+            url_from = form.get('url_from', None)
+            if url_from:
+                try:
+                    if url_from[-1] != '/': url_from=url_from+'/'
+                    urllib2.urlopen(url=url_from, timeout=4)
+                    
+                    self.url_joomla = url_from
+                    import pdb;pdb.set_trace()
+                    #Busca todos os menus da base do joomla
+                    result_menus = store.find(Menu).order_by(Menu.sublevel, Menu.parent, Menu.ordering)
+                    for menu in result_menus:
+                        self.importMenu(menu=menu)
+                except:
+                    print 'URL Incorreta'
+                    return
         
     def importMenu(self,
                    menu=None,
