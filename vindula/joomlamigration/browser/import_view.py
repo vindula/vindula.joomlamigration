@@ -92,7 +92,6 @@ class ImportJoomla(BrowserView):
                     urllib2.urlopen(url=url_from, timeout=4)
                     
                     self.url_joomla = url_from
-                    import pdb;pdb.set_trace()
                     #Busca todos os menus da base do joomla
                     result_menus = store.find(Menu).order_by(Menu.sublevel, Menu.parent, Menu.ordering)
                     for menu in result_menus:

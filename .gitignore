@@ -29,3 +29,5 @@ pip-log.txt
 vindula/joomlamigration/browser/templates/.tmp_import.pt.46287~
 
 .project
+
+.pydevproject
