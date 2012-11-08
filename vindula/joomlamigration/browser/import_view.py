@@ -37,7 +37,7 @@ class ImportJoomla(BrowserView):
     
     url_joomla = ''
     
-    def createContent(self, store_obj=None, context=None):
+    def createContent(self, store_obj=None, context=None, portal_type='VindulaNews'):
         if not context:
             context = getSite()
             
@@ -71,7 +71,7 @@ class ImportJoomla(BrowserView):
             conteudo['text'] = text_store
             conteudo['state'] = store_obj.state
             
-            obj = context.invokeFactory( type_name='VindulaNews',
+            obj = context.invokeFactory( type_name=portal_type,
                                          id=conteudo['id'],
                                          title=conteudo['title'],
                                          text=conteudo['text'],)
@@ -146,9 +146,13 @@ class ImportJoomla(BrowserView):
         elif view.lower() == 'category':
             if id:
                 result = store.find(Conteudo, Conteudo.catid == int(id), Conteudo.state >= 0).order_by(Conteudo.ordering)
+                if menu.alias.find('edital') != -1 or menu.alias.find('editais') != -1:
+                    portal_type = 'VindulaEdital'
+                else:
+                    portal_type = 'VindulaNews'
                 for item in result:
                     try:
-                        obj_content = self.createContent(item, context)
+                        obj_content = self.createContent(item, context, portal_type)
                         try:
                             estado_obj = obj_content.portal_workflow.getInfoFor(obj_content,'review_state')    
                             if estado_obj == 'private' and item.state == 1:
@@ -165,49 +169,6 @@ class ImportJoomla(BrowserView):
             self.importMenu(menu=child_menu, context=context)
         
         return True
-
-        
-        
-        
-        
-        
-        
-        
-        if result_menus:
-            for menu in result_menus:
-                params_link = url_to_params(menu.link)
-                view = params_link.get('view', '')
-                
-                if menu.sublevel == 0:
-                    if view.lower() == 'article':
-                        id = params_link.get('id', '')
-                        if id:
-                            conteudo = {}
-                            result = store.find(Conteudo, Conteudo.id == int(id))
-                            if result:
-                                result = result.one()
-                                obj = self.createContent(result, portal_obj)
-                                
-                    elif view.lower() == 'category':
-                        folder = {}
-                        folder['title'] = menu.name
-                        folder['id'] = menu.alias
-                        folder['state'] = menu.published
-                        
-                        obj = portal_obj.invokeFactory( type_name='VindulaFolder',
-                                                        id=folder['id'],
-                                                        title=folder['title'],)
-                        
-                        context = portal_obj[obj]
-                        print "Pasta criado: %s" % context.absolute_url_path()
-
-                        id = params_link.get('id', '')
-                        if id:
-                            result = store.find(Conteudo, Conteudo.catid == int(id))
-                            for item in result:
-                                obj = self.createContent(item, context)
-                                
-                                
     
     def getContentsJoomla(self):
         result = []
