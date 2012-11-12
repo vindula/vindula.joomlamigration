@@ -96,8 +96,8 @@ class ImportJoomla(BrowserView):
                     result_menus = store.find(Menu).order_by(Menu.sublevel, Menu.parent, Menu.ordering)
                     for menu in result_menus:
                         self.importMenu(menu=menu)
-                except:
-                    print 'URL Incorreta'
+                except Exception as e:
+                    print 'Erro importando portal: ' + e
                     return
         
     def importMenu(self,
