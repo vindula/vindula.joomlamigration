@@ -97,7 +97,7 @@ class ImportJoomla(BrowserView):
                     for menu in result_menus:
                         self.importMenu(menu=menu)
                 except Exception as e:
-                    print 'Erro importando portal: ' + e
+                    print 'Erro importando portal: %s' % (e)
                     return
         
     def importMenu(self,
