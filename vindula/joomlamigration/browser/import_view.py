@@ -118,7 +118,7 @@ class ImportJoomla(BrowserView):
                                          title=menu.name,)
         except:
             obj = context.invokeFactory( type_name='VindulaFolder',
-                                         id=menu.alias+str(randint(0,100)),
+                                         id=menu.alias+str(randint(0,10000)),
                                          title=menu.name,)
         
         context = context[obj]
@@ -139,9 +139,12 @@ class ImportJoomla(BrowserView):
                 if result:
                     obj_content = self.createContent(result, context)
                     context.setDefaultPage(obj_content.id)
-                    estado_obj = obj_content.portal_workflow.getInfoFor(obj_content,'review_state')    
-                    if estado_obj == 'private' and result.state == 1:
-                        obj_content.portal_workflow.doActionFor(obj_content, 'publish')
+                    try:
+                        estado_obj = context.portal_workflow.getInfoFor(context,'review_state')    
+                        if estado_obj == 'private' and result.state == 1:
+                            obj_content.portal_workflow.doActionFor(obj_content, 'publish')
+                            print 'Objeto publicado: %s' % obj_content.id
+                    except: pass
                     
         elif view.lower() == 'category':
             if id:
