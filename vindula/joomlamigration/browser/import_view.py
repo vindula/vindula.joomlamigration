@@ -126,6 +126,7 @@ class ImportJoomla(BrowserView):
                 estado_obj = context.portal_workflow.getInfoFor(context,'review_state')    
                 if estado_obj == 'private' and menu.published == 1:
                     context.portal_workflow.doActionFor(context, 'publish')
+                    print 'Objeto publicado: %s' % context.id
             except: pass
             
             params_link = url_to_params(menu.link)
