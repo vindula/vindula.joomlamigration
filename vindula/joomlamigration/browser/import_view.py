@@ -106,72 +106,72 @@ class ImportJoomla(BrowserView):
         if not context:
             context = getSite()
         
-        #Cria pasta 
-        children_menus = store.find(Menu,
-                                    Menu.parent==menu.id,
-                                    Menu.sublevel==menu.sublevel+1,).order_by(Menu.ordering)
-        
-        
-        try:                            
+        #Checa se existe o conteudo no contexto
+        if context.get(menu.alias, None):
+            print 'O objeto ja existe'
+            return False
+        else:
+            #Cria pasta 
+            children_menus = store.find(Menu,
+                                        Menu.parent==menu.id,
+                                        Menu.sublevel==menu.sublevel+1,).order_by(Menu.ordering)
+            
+            
             obj = context.invokeFactory( type_name='VindulaFolder',
                                          id=menu.alias,
                                          title=menu.name,)
-        except:
-            obj = context.invokeFactory( type_name='VindulaFolder',
-                                         id=menu.alias+str(randint(0,10000)),
-                                         title=menu.name,)
         
-        context = context[obj]
-        try:
-            estado_obj = context.portal_workflow.getInfoFor(context,'review_state')    
-            if estado_obj == 'private' and menu.published == 1:
-                context.portal_workflow.doActionFor(context, 'publish')
-        except: pass
-        
-        params_link = url_to_params(menu.link)
-        view = params_link.get('view', '')
-        id = params_link.get('id', '')
-        
-        if view.lower() == 'article':
-            if id:
-                result = store.find(Conteudo, Conteudo.id == int(id))
-                result = result.one()
-                if result:
-                    obj_content = self.createContent(result, context)
-                    context.setDefaultPage(obj_content.id)
-                    try:
-                        estado_obj = context.portal_workflow.getInfoFor(context,'review_state')    
-                        if estado_obj == 'private' and result.state == 1:
-                            obj_content.portal_workflow.doActionFor(obj_content, 'publish')
-                            print 'Objeto publicado: %s' % obj_content.id
-                    except: pass
-                    
-        elif view.lower() == 'category':
-            if id:
-                result = store.find(Conteudo, Conteudo.catid == int(id), Conteudo.state >= 0).order_by(Conteudo.ordering)
-                if menu.alias.find('edital') != -1 or menu.alias.find('editais') != -1:
-                    portal_type = 'VindulaEdital'
-                else:
-                    portal_type = 'VindulaNews'
-                for item in result:
-                    try:
-                        obj_content = self.createContent(item, context, portal_type)
+            context = context[obj]
+            try:
+                estado_obj = context.portal_workflow.getInfoFor(context,'review_state')    
+                if estado_obj == 'private' and menu.published == 1:
+                    context.portal_workflow.doActionFor(context, 'publish')
+            except: pass
+            
+            params_link = url_to_params(menu.link)
+            view = params_link.get('view', '')
+            id = params_link.get('id', '')
+            
+            if view.lower() == 'article':
+                if id:
+                    result = store.find(Conteudo, Conteudo.id == int(id))
+                    result = result.one()
+                    if result:
+                        obj_content = self.createContent(result, context)
+                        context.setDefaultPage(obj_content.id)
                         try:
-                            estado_obj = obj_content.portal_workflow.getInfoFor(obj_content,'review_state')    
-                            if estado_obj == 'private' and item.state == 1:
+                            estado_obj = context.portal_workflow.getInfoFor(context,'review_state')    
+                            if estado_obj == 'private' and result.state == 1:
                                 obj_content.portal_workflow.doActionFor(obj_content, 'publish')
                                 print 'Objeto publicado: %s' % obj_content.id
                         except: pass
-                    except:
-                        pass
-                    
-        
-        print (menu.sublevel+1)*'\t',menu.name,'|',menu.sublevel,'\n'
-        
-        for child_menu in children_menus:
-            self.importMenu(menu=child_menu, context=context)
-        
-        return True
+                        
+            elif view.lower() == 'category':
+                if id:
+                    result = store.find(Conteudo, Conteudo.catid == int(id), Conteudo.state >= 0).order_by(Conteudo.ordering)
+                    if menu.alias.find('edital') != -1 or menu.alias.find('editais') != -1:
+                        portal_type = 'VindulaEdital'
+                    else:
+                        portal_type = 'VindulaNews'
+                    for item in result:
+                        try:
+                            obj_content = self.createContent(item, context, portal_type)
+                            try:
+                                estado_obj = obj_content.portal_workflow.getInfoFor(obj_content,'review_state')    
+                                if estado_obj == 'private' and item.state == 1:
+                                    obj_content.portal_workflow.doActionFor(obj_content, 'publish')
+                                    print 'Objeto publicado: %s' % obj_content.id
+                            except: pass
+                        except:
+                            pass
+                        
+            
+            print (menu.sublevel+1)*'\t',menu.name,'|',menu.sublevel,'\n'
+            
+            for child_menu in children_menus:
+                self.importMenu(menu=child_menu, context=context)
+            
+            return True
     
     def getContentsJoomla(self):
         result = []
